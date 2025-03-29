@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meu Perfil - KayaCompras</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .navbar-custom {
+            background-color: #2E8B57;
+        }
+        .navbar-custom .navbar-brand, 
+        .navbar-custom .nav-link {
+            color: white;
+        }
+        .btn-custom {
+            background-color: #2E8B57;
+            border-color: #2E8B57;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #228B22;
+            border-color: #228B22;
+            color: white;
+        }
+        .footer-custom {
+            background-color: #2E8B57;
+            color: white;
+        }
+        .profile-icon {
+            font-size: 5rem;
+            color: #2E8B57;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegação -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">KayaCompras</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart">
+                            <i class="bi bi-cart"></i> Carrinho
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${currentUser != null && currentUser.role.name() == 'ADMIN'}">
+                        <a class="nav-link" href="/admin">
+                            <i class="bi bi-gear"></i> Admin
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/order">
+                            <i class="bi bi-box"></i> Meus Pedidos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/profile">
+                            <i class="bi bi-person"></i> <span th:text="${currentUser.username}"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="btn btn-link nav-link">
+                                <i class="bi bi-box-arrow-right"></i> Sair
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alerta de mensagens -->
+    <div class="alert alert-success alert-dismissible fade show" th:if="${successMessage}" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${errorMessage}" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">Meu Perfil</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-4 text-center mb-4">
+                                <div class="avatar bg-light rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                                    <i class="bi bi-person-circle profile-icon"></i>
+                                </div>
+                                <h5 th:text="${user.username}" class="mb-1">Nome de Usuário</h5>
+                                <span class="badge" 
+                                      th:classappend="${user.role.name() == 'ADMIN' ? 'bg-danger' : 'bg-success'}"
+                                      th:text="${user.role.name() == 'ADMIN' ? 'Administrador' : 'Cliente'}">
+                                      Tipo de Conta
+                                </span>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Informações da Conta</div>
+                                    <div class="card-body">
+                                        <p><strong>Email:</strong> <span th:text="${user.email}">email@exemplo.com</span></p>
+                                        <p><strong>Membro desde:</strong> <span>Março 2025</span></p>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Endereço de Entrega</div>
+                                    <div class="card-body">
+                                        <p>Por favor, adicione um endereço de entrega para suas compras.</p>
+                                        <button type="button" class="btn btn-sm btn-custom">
+                                            <i class="bi bi-house-add"></i> Adicionar Endereço
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <a href="/order" class="btn btn-custom">
+                                        <i class="bi bi-box"></i> Meus Pedidos
+                                    </a>
+                                    
+                                    <a href="/" class="btn btn-outline-secondary">
+                                        <i class="bi bi-shop"></i> Ir para Loja
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="footer-custom text-center py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>KayaCompras</h5>
+                    <p class="mb-0">Artesanato e Produtos de Marromeu, Sofala - Moçambique</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>Contato</h5>
+                    <p class="mb-0">Email: info@kayacompras.co.mz<br>Tel: +258 84 123 4567</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Siga-nos</h5>
+                    <div>
+                        <a href="#" class="text-white me-2"><i class="bi bi-facebook fs-4"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-instagram fs-4"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-whatsapp fs-4"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3 bg-white">
+            <p class="mb-0">&copy; 2025 KayaCompras. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Painel Admin - KayaCompras</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .admin-sidebar {
+            background-color: #2c3e50;
+            color: white;
+            min-height: 100vh;
+        }
+        .admin-sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.2rem;
+            border-radius: 0.25rem;
+        }
+        .admin-sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .admin-sidebar .nav-link.active {
+            color: white;
+            background-color: #2E8B57;
+        }
+        .admin-content {
+            padding: 2rem;
+        }
+        .stats-card {
+            border-left: 5px solid;
+            border-radius: 0.25rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .stats-card-primary {
+            border-left-color: #2E8B57;
+        }
+        .stats-card-info {
+            border-left-color: #3498db;
+        }
+        .stats-card-success {
+            border-left-color: #2ecc71;
+        }
+        .stats-card-warning {
+            border-left-color: #f39c12;
+        }
+        .admin-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            padding: 1rem 0;
+        }
+        .btn-custom {
+            background-color: #2E8B57;
+            border-color: #2E8B57;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #228B22;
+            border-color: #228B22;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 admin-sidebar p-0 d-md-block">
+                <div class="text-center admin-logo py-4">
+                    <i class="bi bi-shop me-2"></i>KayaCompras
+                </div>
+                <hr class="text-white-50">
+                <div class="d-flex flex-column p-3">
+                    <span class="text-white-50 small mb-2">MENU</span>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin">
+                                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/products">
+                                <i class="bi bi-box-seam me-2"></i> Produtos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/orders">
+                                <i class="bi bi-cart-check me-2"></i> Pedidos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/users">
+                                <i class="bi bi-people me-2"></i> Usuários
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <hr class="text-white-50">
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                <i class="bi bi-shop me-2"></i> Ver Loja
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="btn btn-link nav-link w-100 text-start">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Sair
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Conteúdo Principal -->
+            <div class="col-md-9 col-lg-10 p-0">
+                <nav class="navbar navbar-light bg-light border-bottom px-4">
+                    <div class="container-fluid">
+                        <span class="navbar-brand mb-0 h1">Dashboard</span>
+                        <div class="d-flex">
+                            <span class="navbar-text me-3">
+                                Bem-vindo, <strong th:text="${currentUser.username}">Admin</strong>
+                            </span>
+                        </div>
+                    </div>
+                </nav>
+                
+                <!-- Alerta de mensagens -->
+                <div class="alert alert-success alert-dismissible fade show m-3" th:if="${successMessage}" role="alert">
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="alert alert-danger alert-dismissible fade show m-3" th:if="${errorMessage}" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div class="admin-content">
+                    <h2 class="mb-4">Painel de Controle</h2>
+                    
+                    <!-- Cards Estatísticos -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stats-card stats-card-primary h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-muted">Pedidos Totais</h6>
+                                            <h3 class="mb-0" th:text="${orderCount}">0</h3>
+                                        </div>
+                                        <div class="bg-light p-3 rounded">
+                                            <i class="bi bi-cart-check text-success fs-3"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stats-card stats-card-info h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-muted">Usuários Registrados</h6>
+                                            <h3 class="mb-0" th:text="${userCount}">0</h3>
+                                        </div>
+                                        <div class="bg-light p-3 rounded">
+                                            <i class="bi bi-people text-primary fs-3"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stats-card stats-card-success h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-muted">Receita Mensal</h6>
+                                            <h3 class="mb-0">MZN 15,250</h3>
+                                        </div>
+                                        <div class="bg-light p-3 rounded">
+                                            <i class="bi bi-currency-dollar text-success fs-3"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stats-card stats-card-warning h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-muted">Pedidos Pendentes</h6>
+                                            <h3 class="mb-0">5</h3>
+                                        </div>
+                                        <div class="bg-light p-3 rounded">
+                                            <i class="bi bi-hourglass-split text-warning fs-3"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráfico (Representação simulada) -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Visão Geral de Vendas</h5>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary">Dia</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary active">Semana</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary">Mês</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 300px; background-color: #f8f9fa; border-radius: 0.25rem;">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    <p class="text-muted">Gráfico de vendas seria exibido aqui</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pedidos Recentes -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Pedidos Recentes</h5>
+                            <a href="/admin/orders" class="btn btn-sm btn-custom">Ver Todos</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Cliente</th>
+                                            <th>Data</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:if="${#lists.isEmpty(recentOrders)}">
+                                            <td colspan="6" class="text-center">Nenhum pedido encontrado</td>
+                                        </tr>
+                                        <tr th:each="order : ${recentOrders}">
+                                            <td th:text="${order.id}"></td>
+                                            <td th:text="${order.user.username}"></td>
+                                            <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                                            <td>MZN <span th:text="${#numbers.formatDecimal(order.totalPrice, 1, 2)}"></span></td>
+                                            <td>
+                                                <span class="badge" 
+                                                      th:classappend="${
+                                                        order.status.name() == 'PENDING' ? 'bg-warning' : 
+                                                        order.status.name() == 'PROCESSING' ? 'bg-info' : 
+                                                        order.status.name() == 'SHIPPED' ? 'bg-primary' : 
+                                                        order.status.name() == 'DELIVERED' ? 'bg-success' : 
+                                                        'bg-danger'}"
+                                                      th:text="${order.status.name() == 'PENDING' ? 'Pendente' : 
+                                                               order.status.name() == 'PROCESSING' ? 'Em Processamento' : 
+                                                               order.status.name() == 'SHIPPED' ? 'Enviado' : 
+                                                               order.status.name() == 'DELIVERED' ? 'Entregue' : 
+                                                               'Cancelado'}">
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a th:href="@{/admin/orders/{id}(id=${order.id})}" class="btn btn-sm btn-info">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ações Rápidas -->
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card shadow h-100">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Ações Rápidas</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <a href="/admin/products/add" class="btn btn-outline-primary">
+                                            <i class="bi bi-plus-circle"></i> Adicionar Novo Produto
+                                        </a>
+                                        <a href="/admin/orders" class="btn btn-outline-info">
+                                            <i class="bi bi-clipboard-check"></i> Gerenciar Pedidos
+                                        </a>
+                                        <a href="/admin/users" class="btn btn-outline-secondary">
+                                            <i class="bi bi-people"></i> Ver Usuários
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card shadow h-100">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Informações do Sistema</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Versão da Aplicação:</strong> KayaCompras 1.0.0</p>
+                                    <p><strong>Última Atualização:</strong> 29 de Março, 2025</p>
+                                    <p><strong>Status do Sistema:</strong> <span class="badge bg-success">Operacional</span></p>
+                                    <p><strong>Ambiente:</strong> Produção</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

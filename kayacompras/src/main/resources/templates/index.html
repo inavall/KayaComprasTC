@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KayaCompras - Artesanato e Produtos de Marromeu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://via.placeholder.com/1920x600');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 0;
+        }
+        .navbar-custom {
+            background-color: #2E8B57;
+        }
+        .navbar-custom .navbar-brand, 
+        .navbar-custom .nav-link {
+            color: white;
+        }
+        .btn-custom {
+            background-color: #2E8B57;
+            border-color: #2E8B57;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #228B22;
+            border-color: #228B22;
+            color: white;
+        }
+        .footer-custom {
+            background-color: #2E8B57;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegação -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">KayaCompras</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    <!-- Menu para usuários logados -->
+                    <li class="nav-item" th:if="${currentUser != null}">
+                        <a class="nav-link" href="/cart">
+                            <i class="bi bi-cart"></i> Carrinho
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${currentUser != null && currentUser.role.name() == 'ADMIN'}">
+                        <a class="nav-link" href="/admin">
+                            <i class="bi bi-gear"></i> Admin
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${currentUser != null}">
+                        <a class="nav-link" href="/order">
+                            <i class="bi bi-box"></i> Meus Pedidos
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${currentUser != null}">
+                        <a class="nav-link" href="/profile">
+                            <i class="bi bi-person"></i> <span th:text="${currentUser.username}"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${currentUser != null}">
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="btn btn-link nav-link">
+                                <i class="bi bi-box-arrow-right"></i> Sair
+                            </button>
+                        </form>
+                    </li>
+                    
+                    <!-- Menu para usuários não logados -->
+                    <li class="nav-item" th:if="${currentUser == null}">
+                        <a class="nav-link" href="/login">
+                            <i class="bi bi-door-open"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${currentUser == null}">
+                        <a class="nav-link" href="/register">
+                            <i class="bi bi-person-plus"></i> Registrar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alerta de mensagens -->
+    <div class="alert alert-success alert-dismissible fade show" th:if="${successMessage}" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${errorMessage}" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Banner principal -->
+    <header class="hero-section">
+        <div class="container text-center">
+            <h1>Bem-vindo à KayaCompras!</h1>
+            <p class="lead">Descubra o melhor do artesanato e produtos locais de Marromeu, Sofala - Moçambique</p>
+            <form class="d-flex justify-content-center my-4" method="get" action="/">
+                <div class="input-group" style="max-width: 500px;">
+                    <input type="text" class="form-control" name="search" placeholder="Buscar produtos..." th:value="${param.search}">
+                    <button class="btn btn-light" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </header>
+
+    <!-- Seção de categorias -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">Categorias Populares</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="bi bi-basket fs-1 text-success"></i>
+                            <h5 class="card-title mt-3">Artesanato</h5>
+                            <p class="card-text">Descubra peças únicas feitas à mão por artesãos locais de Marromeu.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="bi bi-tree fs-1 text-success"></i>
+                            <h5 class="card-title mt-3">Produtos Naturais</h5>
+                            <p class="card-text">Alimentos e produtos orgânicos cultivados nas terras férteis de Sofala.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="bi bi-palette fs-1 text-success"></i>
+                            <h5 class="card-title mt-3">Arte e Decoração</h5>
+                            <p class="card-text">Obras de arte e peças decorativas que representam a rica cultura de Moçambique.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção de Produtos -->
+    <section id="produtos" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Nossos Produtos</h2>
+            
+            <!-- Mensagem quando não há produtos -->
+            <div class="alert alert-info" role="alert" th:if="${#lists.isEmpty(products)}">
+                Nenhum produto encontrado.
+            </div>
+            
+            <div class="row g-4" th:unless="${#lists.isEmpty(products)}">
+                <!-- Lista de produtos -->
+                <div class="col-md-4 mb-4" th:each="product : ${products}">
+                    <div class="card h-100 shadow-sm">
+                        <img th:src="${product.imageUrl != null ? product.imageUrl : 'https://via.placeholder.com/350x200'}" 
+                             class="card-img-top" th:alt="${product.name}">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" th:text="${product.name}">Produto</h5>
+                            <p class="card-text" th:text="${product.description}">Descrição do produto</p>
+                            <p class="text-success fw-bold">MZN <span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span></p>
+                            
+                            <div class="mt-auto" th:if="${currentUser != null}">
+                                <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
+                                    <div class="input-group mb-3">
+                                        <input type="number" class="form-control" name="quantity" value="1" min="1">
+                                        <button class="btn btn-custom" type="submit">
+                                            <i class="bi bi-cart-plus"></i> Adicionar
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <div class="mt-auto" th:if="${currentUser == null}">
+                                <a href="/login" class="btn btn-custom w-100">
+                                    <i class="bi bi-door-open"></i> Entre para comprar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Sobre Nós -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2>Sobre a KayaCompras</h2>
+                    <p>A KayaCompras é uma plataforma online dedicada a promover e vender produtos artesanais e locais de Marromeu, na província de Sofala, Moçambique.</p>
+                    <p>Nossa missão é conectar artesãos e produtores locais com clientes em todo o país, valorizando a cultura e as tradições da região enquanto fomentamos o desenvolvimento econômico local.</p>
+                    <p>Cada produto vendido em nossa plataforma contribui diretamente para a economia da comunidade e ajuda a preservar técnicas artesanais tradicionais.</p>
+                </div>
+                <div class="col-lg-6">
+                    <img src="https://via.placeholder.com/600x400" class="img-fluid rounded shadow" alt="Artesãos de Marromeu">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="footer-custom text-center py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>KayaCompras</h5>
+                    <p class="mb-0">Artesanato e Produtos de Marromeu, Sofala - Moçambique</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>Contato</h5>
+                    <p class="mb-0">Email: info@kayacompras.co.mz<br>Tel: +258 84 123 4567</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Siga-nos</h5>
+                    <div>
+                        <a href="#" class="text-white me-2"><i class="bi bi-facebook fs-4"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-instagram fs-4"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-whatsapp fs-4"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3 bg-white">
+            <p class="mb-0">&copy; 2025 KayaCompras. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

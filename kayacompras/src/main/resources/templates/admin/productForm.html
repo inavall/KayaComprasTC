@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${product.id == null ? 'Adicionar Produto' : 'Editar Produto'} + ' - KayaCompras'">Formulário de Produto - KayaCompras</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .admin-sidebar {
+            background-color: #2c3e50;
+            color: white;
+            min-height: 100vh;
+        }
+        .admin-sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.2rem;
+            border-radius: 0.25rem;
+        }
+        .admin-sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .admin-sidebar .nav-link.active {
+            color: white;
+            background-color: #2E8B57;
+        }
+        .admin-content {
+            padding: 2rem;
+        }
+        .admin-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            padding: 1rem 0;
+        }
+        .btn-custom {
+            background-color: #2E8B57;
+            border-color: #2E8B57;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #228B22;
+            border-color: #228B22;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 admin-sidebar p-0 d-md-block">
+                <div class="text-center admin-logo py-4">
+                    <i class="bi bi-shop me-2"></i>KayaCompras
+                </div>
+                <hr class="text-white-50">
+                <div class="d-flex flex-column p-3">
+                    <span class="text-white-50 small mb-2">MENU</span>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">
+                                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/products">
+                                <i class="bi bi-box-seam me-2"></i> Produtos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/orders">
+                                <i class="bi bi-cart-check me-2"></i> Pedidos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/users">
+                                <i class="bi bi-people me-2"></i> Usuários
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <hr class="text-white-50">
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                <i class="bi bi-shop me-2"></i> Ver Loja
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="btn btn-link nav-link w-100 text-start">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Sair
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Conteúdo Principal -->
+            <div class="col-md-9 col-lg-10 p-0">
+                <nav class="navbar navbar-light bg-light border-bottom px-4">
+                    <div class="container-fluid">
+                        <span class="navbar-brand mb-0 h1" th:text="${product.id == null ? 'Adicionar Novo Produto' : 'Editar Produto'}">Formulário de Produto</span>
+                        <div class="d-flex">
+                            <span class="navbar-text me-3">
+                                Bem-vindo, <strong th:text="${currentUser.username}">Admin</strong>
+                            </span>
+                        </div>
+                    </div>
+                </nav>
+                
+                <!-- Alerta de mensagens -->
+                <div class="alert alert-success alert-dismissible fade show m-3" th:if="${successMessage}" role="alert">
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="alert alert-danger alert-dismissible fade show m-3" th:if="${errorMessage}" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div class="admin-content">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card shadow">
+                                <div class="card-header">
+                                    <h5 class="mb-0" th:text="${product.id == null ? 'Adicionar Novo Produto' : 'Editar Produto: ' + product.name}">Formulário de Produto</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form th:object="${product}" th:action="${product.id == null ? '/admin/products/add' : '/admin/products/edit/' + product.id}" method="post">
+                                        <div class="mb-3">
+                                            <label for="name" class="form-label">Nome do Produto</label>
+                                            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="description" class="form-label">Descrição</label>
+                                            <textarea class="form-control" id="description" th:field="*{description}" rows="4" required></textarea>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="price" class="form-label">Preço (MZN)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">MZN</span>
+                                                    <input type="number" class="form-control" id="price" th:field="*{price}" step="0.01" min="0.01" required>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <label for="stockQuantity" class="form-label">Quantidade em Estoque</label>
+                                                <input type="number" class="form-control" id="stockQuantity" th:field="*{stockQuantity}" min="0" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="imageUrl" class="form-label">URL da Imagem</label>
+                                            <input type="text" class="form-control" id="imageUrl" th:field="*{imageUrl}">
+                                            <div class="form-text">Deixe em branco para usar uma imagem padrão.</div>
+                                        </div>
+                                        
+                                        <div th:if="${product.id != null}" class="mb-4">
+                                            <label class="form-label">Imagem Atual</label>
+                                            <div>
+                                                <img th:src="${product.imageUrl != null ? product.imageUrl : 'https://via.placeholder.com/150x150'}" 
+                                                     class="img-thumbnail" style="max-width: 150px;">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between">
+                                            <a href="/admin/products" class="btn btn-outline-secondary">
+                                                <i class="bi bi-arrow-left"></i> Voltar
+                                            </a>
+                                            <button type="submit" class="btn btn-custom">
+                                                <i class="bi bi-save"></i> Salvar Produto
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
